@@ -1,8 +1,10 @@
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-DATABASE_URL = "postgresql://postgres:password@localhost:5432/agrologger"
+# ✅ читаємо з Environment Variables
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 engine = create_engine(DATABASE_URL)
 
@@ -14,7 +16,6 @@ SessionLocal = sessionmaker(
 
 Base = declarative_base()
 
-# 👇 ОЦЕ ОБОВ’ЯЗКОВО
 def get_db():
     db = SessionLocal()
     try:
