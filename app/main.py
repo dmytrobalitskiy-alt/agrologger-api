@@ -2,6 +2,8 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List, Optional
 import psycopg2
+mport os
+from urllib.parse import iot
 
 from app.routers import iot
 from app.scheduler import start_scheduler
@@ -13,18 +15,19 @@ app = FastAPI(title="AgroLogger API")
 app.include_router(iot.router)
 
 # ---------- DB CONFIG ----------
-DB_HOST = "localhost"
-DB_NAME = "agrologger"
-DB_USER = "postgres"
-DB_PASS = "3108"
-
+DATABASE_URL = os.getenv("DATABASE_URL") 
 
 def get_conn():
+    if not DATABASE_URL:
+        raise Exception("DATABASE_URL not set in environment")
+
+    result = urlparse(DATABASE_URL)
     return psycopg2.connect(
-        host=DB_HOST,
-        database=DB_NAME,
-        user=DB_USER,
-        password=DB_PASS
+        host=result.hostname,
+        database=result.path[1:], # прибираємо "/" на початку
+        user=result.username,
+        password=result.password,
+        port=result.port
     )
 
 
