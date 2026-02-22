@@ -1,6 +1,8 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime
 import psycopg2
+import os                # ✅ додаємо імпорт os
+from urllib.parse import urlparse  # ✅ додаємо urlparse
 
 # Конфіг БД (можна винести у config.py)
 DATABASE_URL = os.getenv("DATABASE_URL") 
@@ -12,12 +14,11 @@ def get_conn():
     result = urlparse(DATABASE_URL)
     return psycopg2.connect(
         host=result.hostname,
-        database=result.path[1:], # прибираємо "/" на початку
+        database=result.path[1:],  # прибираємо "/" на початку
         user=result.username,
         password=result.password,
         port=result.port
     )
-
 
 def aggregate_daily_weather():
     conn = get_conn()
@@ -53,15 +54,21 @@ def aggregate_daily_weather():
         press_avg = sum(press) / len(press)
 
         cur.execute("""
-            INSERT INTO weather_daily (field_id, date, temp_min, temp_max, temp_avg, humidity_avg, pressure_avg, battery, signal)
+            INSERT INTO weather_daily (
+                field_id, date, temp_min, temp_max, temp_avg,
+                humidity_avg, pressure_avg, battery, signal
+            )
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
             ON CONFLICT (field_id, date) DO NOTHING
-        """, (field_id, datetime.now().date(), temp_min, temp_max, temp_avg, hum_avg, press_avg, battery_last, signal_last))
+        """, (
+            field_id, datetime.now().date(),
+            temp_min, temp_max, temp_avg,
+            hum_avg, press_avg, battery_last, signal_last
+        ))
 
     conn.commit()
     cur.close()
     conn.close()
-
 
 def start_scheduler():
     scheduler = BackgroundScheduler()
