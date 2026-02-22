@@ -4,6 +4,8 @@ from datetime import datetime
 import psycopg2
 import time
 import logging   # ⬅️ додаємо логування
+import os        # ⬅️ додаємо імпорт os
+from urllib.parse import urlparse  # ⬅️ додаємо urlparse
 
 router = APIRouter(prefix="/iot", tags=["IoT"])
 
@@ -22,7 +24,6 @@ def get_conn():
         password=result.password,
         port=result.port
     )
-
 
 # ---------- SECURITY ----------
 API_KEY = "supersecretkey123"  # тимчасово, потім винесемо у .env
@@ -53,7 +54,6 @@ class HourlyWeatherData(BaseModel):
     pressure: float
     battery: float
     signal: float
-
 
 # ---------- ENDPOINT ----------
 @router.post("/weather")
