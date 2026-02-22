@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List, Optional
 import psycopg2
-іmport os
+import os
 from urllib.parse import iot
 
 from app.routers import iot
